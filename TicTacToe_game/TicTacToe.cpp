@@ -145,7 +145,7 @@ int TicTacToe::set_player_pos(char player_code, int x_ind, int y_ind) {
             this->main_game_board->at(x_ind)->at(y_ind) = TicTacToe::PLAYER_ONE;
 
             // checking if player1 won with last move
-            if () {
+            if (games_status(TicTacToe::PLAYER_ONE) == PLAYER1_WINS) {
                 cout << "\n\t\t========= [WINNING MESSAGE] PLAYER 1 (X) wins this match =========" << endl;
             }
 
