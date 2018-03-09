@@ -9,11 +9,15 @@ using namespace std;
 int main(void) {
     int board_size = 0;
 
-    cout << "Enter games board size: ";
+    cout << "Enter game board size: ";
     cin >> board_size;
 
-    TicTacToe *game_board = new TicTacToe(board_size);
-    game_board->dipslay_board();
+    TicTacToe *game_board_1 = new TicTacToe(board_size);
+    game_board_1->set_player_pos(TicTacToe::PLAYER_ONE, 0, 2);
+    game_board_1->set_player_pos(TicTacToe::PLAYER_TWO, 1, 1);
+
+
+    game_board_1->dipslay_board();
 
     return EXIT_SUCCESS;
 }
