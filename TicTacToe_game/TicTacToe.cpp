@@ -24,6 +24,7 @@ TicTacToe::TicTacToe(int board_size) {
 
     // initialize board
     this->initialize_game(board_size);
+    this->curr_player = TicTacToe::PLAYER_ONE;
 
 }
 
@@ -91,6 +92,10 @@ void TicTacToe::evaluate_program(int game_code)  {
     }
 }
 
+int TicTacToe::get_current_player() {
+    return this->curr_player;
+}
+
 void TicTacToe::dipslay_board() {
     cout << endl;
     for (UNSIGNED_LONG i = 0; i < this->main_game_board->size(); i++) {
@@ -102,9 +107,7 @@ void TicTacToe::dipslay_board() {
             if (i == this->main_game_board->size()-1) break;
             cout << setw(5) << "___" << setw(1);
         }
-
         cout << endl;
-
     }
     cout << endl;
     cout << "Player 1 (X) at [" << player1_pos->x_pos << ", " << player1_pos->y_pos << "] "
@@ -143,21 +146,19 @@ int TicTacToe::set_player_pos(char player_code, int x_ind, int y_ind) {
             player1_pos->x_pos = x_ind;
             player1_pos->y_pos = y_ind;
             this->main_game_board->at(x_ind)->at(y_ind) = TicTacToe::PLAYER_ONE;
+            this->curr_player = TicTacToe::PLAYER_TWO;
 
             // checking if player1 won with last move
-            if (games_status(TicTacToe::PLAYER_ONE) == PLAYER1_WINS) {
-                cout << "\n\t\t========= [WINNING MESSAGE] PLAYER 1 (X) wins this match =========" << endl;
-            }
+            return games_status(TicTacToe::PLAYER_ONE);
 
         } else if (player_code == TicTacToe::PLAYER_TWO){
             player2_pos->x_pos = x_ind;
             player2_pos->y_pos = y_ind;
             this->main_game_board->at(x_ind)->at(y_ind) = TicTacToe::PLAYER_TWO;
+            this->curr_player = TicTacToe::PLAYER_ONE;
 
-            if (games_status(TicTacToe::PLAYER_TWO) == PLAYER2_WINS) {
-                cout << "\n\t\t======== [WINNING MESSAGE] PLAYER 2 (O) wins this match ==========" << endl;
-            }
-
+            // checking if player2 won with last move
+            return games_status(TicTacToe::PLAYER_TWO);
         }
     }
 }

@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <cassert>
 #include "TicTacToe_game/TicTacToe.h"
 using namespace std;
 
@@ -13,11 +14,31 @@ int main(void) {
     cin >> board_size;
 
     TicTacToe *game_board_1 = new TicTacToe(board_size);
-    game_board_1->set_player_pos(TicTacToe::PLAYER_ONE, 0, 2);
-    game_board_1->set_player_pos(TicTacToe::PLAYER_TWO, 1, 1);
+    assert(game_board_1 != nullptr);
 
+    int game_status = NO_WIN_FOR_PLAYER;
+    int x_cord;
+    int y_cord;
 
-    game_board_1->dipslay_board();
+    do {
+        game_board_1->dipslay_board();
+        cout << endl;
+        if (game_board_1->get_current_player() == TicTacToe::PLAYER_ONE) {
+            cout << "Move for [X] as [x y]: ";
+            cin >> x_cord >> y_cord;
+            game_status = game_board_1->set_player_pos(TicTacToe::PLAYER_ONE, x_cord, y_cord);
+        } else {
+            cout << "Move for [O] as [x y]: ";
+            cin >> x_cord >> y_cord;
+            game_status = game_board_1->set_player_pos(TicTacToe::PLAYER_TWO, x_cord, y_cord);
+        }
+    } while (game_status == NO_WIN_FOR_PLAYER);
+
+    if (game_status == PLAYER1_WINS) {
+        cout << endl << "\t\t[============== PLAYER 1 WINS =============]" << endl;
+    } else if (game_status == PLAYER2_WINS) {
+        cout << endl << "\t\t[============== PLAYER 2 WINS =============]" << endl;
+    }
 
     return EXIT_SUCCESS;
 }

@@ -39,6 +39,7 @@ public:
     void reset_game(int board_size = 3);
     int set_player_pos(char player_code, int x_ind, int y_ind );
     void destroy_game(void);
+    int get_current_player();
 
 
 private:
