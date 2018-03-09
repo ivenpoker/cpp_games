@@ -24,20 +24,23 @@ int main(void) {
         game_board_1->dipslay_board();
         cout << endl;
         if (game_board_1->get_current_player() == TicTacToe::PLAYER_ONE) {
-            cout << "Move for [X] as [x y]: ";
+            cout << "\t\tMove for [X] as [x y]: ";
             cin >> x_cord >> y_cord;
             game_status = game_board_1->set_player_pos(TicTacToe::PLAYER_ONE, x_cord, y_cord);
         } else {
-            cout << "Move for [O] as [x y]: ";
+            cout << "\t\tMove for [O] as [x y]: ";
             cin >> x_cord >> y_cord;
             game_status = game_board_1->set_player_pos(TicTacToe::PLAYER_TWO, x_cord, y_cord);
         }
     } while (game_status == NO_WIN_FOR_PLAYER);
 
     if (game_status == PLAYER1_WINS) {
-        cout << endl << "\t\t[============== PLAYER 1 WINS =============]" << endl;
+        game_board_1->dipslay_board();
+        cout << endl << "\t\t[============== PLAYER 1 WINS =============]\n" << endl;
+
     } else if (game_status == PLAYER2_WINS) {
-        cout << endl << "\t\t[============== PLAYER 2 WINS =============]" << endl;
+        game_board_1->dipslay_board();
+        cout << endl << "\t\t[============== PLAYER 2 WINS =============]\n" << endl;
     }
 
     return EXIT_SUCCESS;

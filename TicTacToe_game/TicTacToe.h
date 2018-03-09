@@ -55,6 +55,7 @@ private:
     int get_int_equivalent(char player_code, int ind_x, int ind_y);
 
     void initialize_game(int board_size);
+    bool is_valid(char player_code);
 
 
 };
