@@ -42,6 +42,7 @@ int main(void) {
         game_board_1->dipslay_board();
         cout << endl << "\t\t[============== PLAYER 2 WINS =============]\n" << endl;
     }
+    game_board_1->destroy_game();
 
     return EXIT_SUCCESS;
 }
