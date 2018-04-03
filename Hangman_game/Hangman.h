@@ -33,6 +33,9 @@ private:
     void initialize_hash_table();
     bool insert_hash_word(unsigned int index, string &word);
     void handle_error_level(int error_code);
+    void insert_between(WORD_NODE_ptr_t fst, WORD_NODE_ptr_t snd);
+    void insert_at_end(string word, WORD_NODE_ptr_t node_ptr);
+    void insert_before(WORD_NODE_ptr_t node, WORD_NODE_ptr_t before_node);
 
     static const string letters[];
 };

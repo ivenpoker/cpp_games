@@ -23,7 +23,7 @@ const string Hangman::letters[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", 
                                    "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
                                    "u", "v", "w", "x", "y", "z"};
 
-int index_equivalent_from_char(char some_char); 
+int index_equivalent_from_char(char some_char);
 
 Hangman::Hangman() {
     this->hash_table = new vector<WORD_NODE_ptr_t >(HARSH_TABLE_SIZE);
@@ -58,7 +58,7 @@ bool Hangman::add_word(string &new_word) {
         cerr << "[WARNING] Cannot add word '" << new_word << "'. It's invalid" << endl;
         return INSERT_FAILURE;
     }
-    return this->insert_hash_word(hash_index, new_word);
+    return this->insert_hash_word(static_cast<unsigned int>(hash_index), new_word);
 }
 
 bool Hangman::insert_hash_word(unsigned int index, string &word) {
@@ -76,10 +76,19 @@ bool Hangman::insert_hash_word(unsigned int index, string &word) {
 
         return INSERT_SUCCESS; // we return 'true' because we've inserted it into the structure.
     } else {
-        WORD_NODE_ptr_t tmp_ptr = this->hash_table->at(index);
+        WORD_NODE_ptr_t tmp_ptr = this->hash_table->at(index)->next_node;
         WORD_NODE_ptr_t new_node = (WORD_NODE_ptr_t)malloc(sizeof(WORD_NODE_t));
+        new_node->word = word;
         ASSERT_NOT_NULL(new_node);
         do {
+            if (tmp_ptr == nullptr) {
+                tmp_ptr = this->hash_table->at(index);
+                tmp_ptr->next_node = new_node;
+                new_node->next_node = nullptr;
+                new_node->prev_node = tmp_ptr;
+
+                return INSERT_SUCCESS;
+            }
             if (tmp_ptr->word == word) {
                 // word found in hash table already. We don't insert it again
                 return INSERT_FAILURE;
@@ -90,7 +99,6 @@ bool Hangman::insert_hash_word(unsigned int index, string &word) {
                 new_node->prev_node = tmp_ptr->prev_node;
                 tmp_ptr->prev_node = new_node;
                 new_node->next_node = tmp_ptr;
-                new_node->word = word;
 
                 return INSERT_SUCCESS;
             } else if (tmp_ptr->word < word) {
@@ -98,7 +106,6 @@ bool Hangman::insert_hash_word(unsigned int index, string &word) {
                     tmp_ptr->next_node = new_node;
                     new_node->next_node = nullptr;
                     new_node->prev_node = tmp_ptr;
-                    new_node->word = word;
 
                     return INSERT_SUCCESS;
                 }
@@ -111,21 +118,33 @@ bool Hangman::insert_hash_word(unsigned int index, string &word) {
     }
 }
 
+void Hangman::insert_at_end(string word, WORD_NODE_ptr_t node_ptr) {
+    if (node_ptr == nullptr) {
+        cerr << "null pointer passed";
+        exit(EXIT_FAILURE);
+    }
+    WORD_NODE_ptr_t new_node = (WORD_NODE_ptr_t)malloc(sizeof(WORD_NODE_t));
+    ASSERT_NOT_NULL(new_node);
+    new_node->word = word;
+    new_node->next_node = node_ptr->next_node;
+    new_node->prev_node = node_ptr;
+    node_ptr->next_node = new_node;
+}
 
 void Hangman::display_words() const {
 
     for (unsigned int i = 0; i < this->hash_table->size(); i++) {
         cout << "'" << Hangman::letters[i] << "' words --> ";
-        WORD_NODE_ptr_t tmp_ptr = this->hash_table->at(i);
-        if (tmp_ptr->next_node == nullptr) {
+        WORD_NODE_ptr_t tmp_ptr = this->hash_table->at(i)->next_node;
+        if (tmp_ptr == nullptr) {
             cout << "[No words yet]" << endl;
             continue;
         }
-        while (tmp_ptr->next_node != nullptr) {
+        while (tmp_ptr != nullptr) {
             cout << tmp_ptr->word << " | ";
-            tmp_ptr = (WORD_NODE_ptr_t) tmp_ptr->next_node;
+            tmp_ptr = tmp_ptr->next_node;
         }
-        cout << endl; 
+        cout << endl;
     }
 }
 

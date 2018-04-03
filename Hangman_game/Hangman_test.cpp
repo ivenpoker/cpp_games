@@ -8,10 +8,10 @@ using namespace std;
 
 int main(void) {
     Hangman *hangman_game = new Hangman();
-    vector<string> words = {"first", "second", "man", "oceans", "king",
+    vector<string> words = {"adam", "asus", "creating", "first", "second", "man", "oceans", "king",
                       "family", "uncle", "usher", "listen", "learn",
-                      "playing", "checking", "creating", "designing",
-                      "flying", "nursing"};
+                      "playing", "checking", "designing",
+                      "flying", "nursing", "zebra", "zoo"};
     for (unsigned int i = 0; i < words.size(); i++)
         hangman_game->add_word(words.at(i));
 
