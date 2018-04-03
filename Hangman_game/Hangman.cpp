@@ -43,8 +43,8 @@ void Hangman::initialize_hash_table() {
         // the node that will links series of other nodes at a particular index.
         // (or an empty linked list associated with a node).
 
-        this->hash_table->at(i)->prev_node = this->hash_table->at(i);
-        this->hash_table->at(i)->next_node = this->hash_table->at(i);
+        this->hash_table->at(i)->prev_node = nullptr;
+        this->hash_table->at(i)->next_node = nullptr;
     }
 }
 
@@ -125,6 +125,7 @@ void Hangman::display_words() const {
             cout << tmp_ptr->word << " | ";
             tmp_ptr = (WORD_NODE_ptr_t) tmp_ptr->next_node;
         }
+        cout << endl; 
     }
 }
 
