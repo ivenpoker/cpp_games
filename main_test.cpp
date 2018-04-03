@@ -7,6 +7,29 @@
 #include "TicTacToe_game/TicTacToe.h"
 using namespace std;
 
+class Linked_list {
+    // linked list definition...
+};
+
+class Node {
+public:
+    Node(string &node_name);
+    void set_node_name(string &some_str);
+    string get_node_name() const;
+
+private:
+    Linked_list coming_in;
+    Linked_list going_out;
+};
+
+class Graph {
+private:
+    Linked_list vertices;
+    Linked_list edges;
+
+};
+
+
 int main(void) {
     int board_size = 0;
 
@@ -42,7 +65,7 @@ int main(void) {
         game_board_1->dipslay_board();
         cout << endl << "\t\t[============== PLAYER 2 WINS =============]\n" << endl;
     }
-    game_board_1->destroy_game();
+    // game_board_1->destroy_game();
 
     return EXIT_SUCCESS;
 }
