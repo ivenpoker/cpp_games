@@ -23,6 +23,9 @@ public:
     bool is_guess_set() const;
     string get_guess() const;
     void set_guess();
+    string test_guess(string &guess_char);
+
+    bool game_is_ready() const;
 
 
 private:
@@ -40,12 +43,16 @@ private:
     ifstream *client_file;
     vector<INDEX_NODE_ptr_t > *hash_table;
     WORD_NODE_ptr_t guessed_word_ptr;           // pointer to guessed word withing data structure.
+    string guessed_string_track;
+
+    bool is_game_ready;
 
     // helper functions
     void initialize_hash_table();
     bool insert_hash_word(unsigned int index, string &word);
     void handle_error_level(int error_code) const;
     void insert_at_end(string word, WORD_NODE_ptr_t node_ptr);
+
 
     static const string letters[];
 };

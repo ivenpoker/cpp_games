@@ -20,8 +20,8 @@ using namespace std;
 #define NULL_POINTER_REQUEST    102
 #define GUESS_NOT_SET           103
 #define FILE_NOT_FOUND          404
-
 #define GUESS_NOT_SET_STRING    "[--- guess not set; call 'set_guess()' function --]"
+#define INVALID_TEST_STRING     "[--- Provide a valid test string --]";
 
 
 
@@ -49,8 +49,9 @@ Hangman::Hangman(string &data_file_path) {
             this->add_word(tmp_str);
             (*this->client_file) >> tmp_str;
         }
+        this->is_game_ready = true;
+        this->set_guess();
     }
-    this->set_guess();
 }
 
 void Hangman::initialize_hash_table() {
@@ -92,6 +93,32 @@ bool Hangman::add_word(string &new_word) {
     return this->insert_hash_word(static_cast<unsigned int>(hash_index), new_word);
 }
 
+bool Hangman::game_is_ready() const {
+    return this->is_game_ready;
+}
+
+string Hangman::test_guess(string &guess_char)  {
+    if (!this->is_guess_set()) {
+        return GUESS_NOT_SET_STRING;
+    } else if (guess_char.empty()) {
+        return guess_char;                      // just return it back to caller
+    } else if (guess_char.length() != 1) {
+        return INVALID_TEST_STRING;
+    }
+
+    string tmp_str;
+    string main_guessed_word = this->guessed_word_ptr->word;
+    for (int i = 0; i < main_guessed_word.length(); i++) {
+        if (main_guessed_word.at(i) == guess_char.at(0)) {
+            tmp_str += i;
+            this->guessed_string_track.at(i) =  guess_char.at(0);
+        } else {
+            tmp_str += " ";
+        }
+    }
+    return this->guessed_string_track;
+
+}
 bool Hangman::insert_hash_word(unsigned int index, string &word) {
 
     WORD_NODE_ptr_t tmp_ptr = this->hash_table->at(index)->index_node->next_node;
@@ -151,7 +178,9 @@ void Hangman::insert_at_end(string word, WORD_NODE_ptr_t node_ptr) {
 
 void Hangman::display_words() const {
 
+    cout << "\n\t#################### Hangman Game Word database #################\n" << endl ;
     for (unsigned int i = 0; i < this->hash_table->size(); i++) {
+        cout << "\t\t";
         cout << "'" << Hangman::letters[i] << "' words [" << setw(2)
              << this->hash_table->at(i)->index_count << "] --> ";
         WORD_NODE_ptr_t tmp_ptr = this->hash_table->at(i)->index_node->next_node;
@@ -166,6 +195,7 @@ void Hangman::display_words() const {
         }
         cout << endl;
     }
+    cout << "\n\t#################################################################" << endl ;
 }
 
 string Hangman::get_guess() const {
@@ -177,12 +207,12 @@ string Hangman::get_guess() const {
 
 void Hangman::set_guess()  {
     srand((unsigned) time(nullptr));  // setting random generator
-    auto rand_index = static_cast<unsigned int>(rand() % HARSH_TABLE_SIZE);
+    auto rand_index = static_cast<unsigned int>(rand() % HARSH_TABLE_SIZE); // getting a random index based on the hashtable size
 
     while (this->hash_table->at(rand_index)->index_node->next_node == nullptr) {
         int new_index = rand() % HARSH_TABLE_SIZE;
 
-        // making sure the previous random number is different from newly created one.
+        // making sure the previous random number is different from newly generated one.
         // if they were same, get a new random number again;
 
         while (new_index == rand_index)
@@ -210,6 +240,13 @@ void Hangman::set_guess()  {
     // our guessed word, by setting a pointer to this word.
 
     this->guessed_word_ptr = tmp_ptr;
+
+    // we now need to initialize the guess string tracker, so that any time a
+    // guess is made the program can keep track of the last guess made
+    // and provide feedback based on the last guesses
+
+    for (int i = 0; i < this->guessed_word_ptr->word.length(); i++)
+        this->guessed_string_track += "_";
 }
 
 bool Hangman::is_guess_set() const {
