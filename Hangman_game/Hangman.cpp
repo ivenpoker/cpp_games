@@ -272,64 +272,16 @@ void Hangman::handle_error_level(int error_code) const {
     }
 }
 
-int index_equivalent_from_char(char some_char) {
-    int shift = -1;
-
-    switch (some_char) {
-
-        case 'A' : return shift + 1;
-        case 'a' : return shift + 1;
-        case 'b' : return shift + 2; 
-        case 'B' : return shift + 2;
-        case 'c' : return shift + 3;
-        case 'C' : return shift + 3;
-        case 'd' : return shift + 4;
-        case 'D' : return shift + 4;
-        case 'e' : return shift + 5;
-        case 'E' : return shift + 5;
-        case 'f' : return shift + 6;
-        case 'F' : return shift + 6;
-        case 'g' : return shift + 7;
-        case 'G' : return shift + 7;
-        case 'h' : return shift + 8;
-        case 'H' : return shift + 8;
-        case 'i' : return shift + 9;
-        case 'I' : return shift + 9;
-        case 'j' : return shift + 10;
-        case 'J' : return shift + 10;
-        case 'k' : return shift + 11;
-        case 'K' : return shift + 11;
-        case 'l' : return shift + 12;
-        case 'L' : return shift + 12;
-        case 'm' : return shift + 13;
-        case 'M' : return shift + 13;
-        case 'n' : return shift + 14;
-        case 'N' : return shift + 14;
-        case 'o' : return shift + 15;
-        case 'O' : return shift + 15;
-        case 'p' : return shift + 16;
-        case 'P' : return shift + 16;
-        case 'q' : return shift + 17;
-        case 'Q' : return shift + 17;
-        case 'r' : return shift + 18;
-        case 'R' : return shift + 18;
-        case 's' : return shift + 19;
-        case 'S' : return shift + 19;
-        case 't' : return shift + 20;
-        case 'T' : return shift + 20;
-        case 'u' : return shift + 21;
-        case 'U' : return shift + 21;
-        case 'v' : return shift + 22;
-        case 'V' : return shift + 22;
-        case 'w' : return shift + 23;
-        case 'W' : return shift + 23;
-        case 'x' : return shift + 24;
-        case 'X' : return shift + 24;
-        case 'y' : return shift + 25;
-        case 'Y' : return shift + 25;
-        case 'z' : return shift + 26;
-        case 'Z' : return shift + 26;
-
-        default: return INVALID_CHAR;
+int index_equivalent_from_char(char some_char)
+{
+    if(some_char >= 'a' &&  some_char <= 'z')
+    {
+        return some_char - 'a';
     }
+    else if(some_char >= 'A' && some_char <= 'Z')
+    {
+        return some_char - 'A';
+    }
+    else
+       return INVALID_CHAR;
 }
