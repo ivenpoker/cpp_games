@@ -72,18 +72,18 @@ int main(void) {
             }
 
             guesses_made = hangman_game->test_guess(tmp_str);
-            cout << "\n\t\t ----> " << setw(2) << "[" << guess_counter + 1 << "]" << " Guesses made so far [";
+            cerr << "\n\t\t ----> " << setw(2) << "[" << guess_counter + 1 << "]" << " Guesses made so far [";
             cerr << guesses_made << "] <----\n" << endl;
 
             if (guess_counter == guess_limit && guesses_made != hangman_game->get_guess()) {
                 cout << "\n\t[====== FAILED: You failed to guess word. Guessed word is --> [" << hangman_game->get_guess()
-                     << "]\n" << endl;
+                     << "] =======] \n" << endl;
                 break;
             }
             ++guess_counter;
         }
 
-        if (guess_counter < guess_limit) {
+        if (guess_counter <= guess_limit) {
             cout << "\n\t[======= SUCCESS: You've finally made a right guess after [" <<  guess_counter << "] trials! Congrats! ========]" << endl;
         }
         cout << "\n\t[ -------------------------- GAME ENDS -------------------------- ]\n" << endl;

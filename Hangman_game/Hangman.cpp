@@ -15,13 +15,14 @@ using namespace std;
 
 // FOR ERROR HANDLING
 
-#define MEMORY_ALLOC_ERROR      100
-#define INVALID_CHAR            101
-#define NULL_POINTER_REQUEST    102
-#define GUESS_NOT_SET           103
-#define FILE_NOT_FOUND          404
-#define GUESS_NOT_SET_STRING    "[--- guess not set; call 'set_guess()' function --]"
-#define INVALID_TEST_STRING     "[--- Provide a valid test string --]";
+#define INTERNAL_PROGRAM_FAILURE 99
+#define MEMORY_ALLOC_ERROR       100
+#define INVALID_CHAR             101
+#define NULL_POINTER_REQUEST     102
+#define GUESS_NOT_SET            103
+#define FILE_NOT_FOUND           404
+#define GUESS_NOT_SET_STRING     "[--- guess not set; call 'set_guess()' function --]"
+#define INVALID_TEST_STRING      "[--- Provide a valid test string --]";
 
 
 
@@ -29,6 +30,10 @@ const string Hangman::letters[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", 
                                    "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
                                    "u", "v", "w", "x", "y", "z"};
 
+/**
+ * Returns the integer equivalent of a letter of the alphabet
+ * (i.e from 0 - 25 (due to indexing in C++))
+ */
 int index_equivalent_from_char(char some_char);
 
 Hangman::Hangman() {
@@ -107,7 +112,7 @@ string Hangman::test_guess(string &guess_char)  {
     }
 
     string tmp_str;
-    string main_guessed_word = this->guessed_word_ptr->word;
+    string main_guessed_word = this->guessed_word_ptr->word;  // copy of guessed word is made
     for (int i = 0; i < main_guessed_word.length(); i++) {
         if (main_guessed_word.at(i) == guess_char.at(0)) {
             tmp_str += i;
@@ -137,8 +142,16 @@ bool Hangman::insert_hash_word(unsigned int index, string &word) {
         }
         if (tmp_ptr->word == word) {
             // word found in hash table already. We don't insert it again
+            // we just ignore it, and flag the insertion procedure as a
+            // failure.
             return INSERT_FAILURE;
-        } else if (tmp_ptr->word > word) {
+
+        }
+
+        // If the word to insert is less than the word pointed to by 'tmp_ptr'
+        // we insert it before 'tmp_ptr'
+
+        else if (tmp_ptr->word > word) {
             tmp_ptr->prev_node->next_node = new_node;
             new_node->prev_node = tmp_ptr->prev_node;
             tmp_ptr->prev_node = new_node;
@@ -146,7 +159,14 @@ bool Hangman::insert_hash_word(unsigned int index, string &word) {
             ++this->hash_table->at(index)->index_count;
 
             return INSERT_SUCCESS;
-        } else if (tmp_ptr->word < word) {
+        }
+
+        // If the word to insert is greater than the word pointed to by 'tmp_ptr'
+        // we insert it after 'tmp_ptr', but we also specially handle the case
+        // where, 'tmp_ptr' might be the LAST node in the doubly linked list data
+        // structure.
+
+        else if (tmp_ptr->word < word) {
             if (tmp_ptr->next_node == nullptr) {
                 tmp_ptr->next_node = new_node;
                 new_node->next_node = nullptr;
@@ -159,21 +179,13 @@ bool Hangman::insert_hash_word(unsigned int index, string &word) {
         }
     } while (tmp_ptr != nullptr);
 
-    // If execution reaches this point it means we're at the end of the
-    // 'hash node linked list' and we've to insert at that
-}
+    // If execution reaches this point, it means we've got an internal problem/
+    // At this level, it's wise we flag the user of the problem and terminate the
+    // program.
 
-void Hangman::insert_at_end(string word, WORD_NODE_ptr_t node_ptr) {
-    if (node_ptr == nullptr) {
-        this->handle_error_level(NULL_POINTER_REQUEST);
-        return;
-    }
-    WORD_NODE_ptr_t new_node = (WORD_NODE_ptr_t)malloc(sizeof(WORD_NODE_t));
-    ASSERT_NOT_NULL(new_node);
-    new_node->word = word;
-    new_node->next_node = node_ptr->next_node;
-    new_node->prev_node = node_ptr;
-    node_ptr->next_node = new_node;
+    this->handle_error_level(INTERNAL_PROGRAM_FAILURE);
+
+
 }
 
 void Hangman::display_words() const {
@@ -256,30 +268,30 @@ bool Hangman::is_guess_set() const {
 void Hangman::handle_error_level(int error_code) const {
     switch (error_code) {
         case MEMORY_ALLOC_ERROR:
-            cerr << "\n\t[INTERNAL ERROR]: Memory allocation error" << endl;
+            cerr << "\n\t[INTERNAL ERROR]: Memory allocation error\n" << endl;
             break;
         case INVALID_CHAR:
-            cerr << "\n\t[INPUT ERROR]: Invalid word provided. Check input" << endl;
+            cerr << "\n\t[INPUT ERROR]: Invalid word provided. Check input\n" << endl;
             break;
         case FILE_NOT_FOUND:
-            cerr << "\n\t[FILE_NOT_FOUND: 404]: File requested not found" << endl;
+            cerr << "\n\t[FILE_NOT_FOUND: 404]: File requested not found\n" << endl;
             break;
         case NULL_POINTER_REQUEST:
-            cerr << "\n\t[NULL POINTER]: Null pointer request detected" << endl;
+            cerr << "\n\t[NULL POINTER]: Null pointer request detected\n" << endl;
+            break;
+        case INTERNAL_PROGRAM_FAILURE:
+            cerr << "\n\t[INTERNAL ERROR]: Internal program error occured\n" << endl;
             break;
         default:
-            cerr << "\n\t[INTERNAL ERROR]: Internal program error occured" << endl;
+            cerr << "\n\t[INTERNAL ERROR]: Unidentified system error\n" << endl;
     }
 }
 
-int index_equivalent_from_char(char some_char)
-{
-    if(some_char >= 'a' &&  some_char <= 'z')
-    {
+int index_equivalent_from_char(char some_char) {
+    if(some_char >= 'a' &&  some_char <= 'z') {
         return some_char - 'a';
     }
-    else if(some_char >= 'A' && some_char <= 'Z')
-    {
+    else if(some_char >= 'A' && some_char <= 'Z') {
         return some_char - 'A';
     }
     else
