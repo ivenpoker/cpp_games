@@ -39,6 +39,7 @@ public:
     int set_player_pos(char player_code, int x_ind, int y_ind );
     void destroy_game(void);
     int get_current_player();
+    ~TicTacToe();
 
 
 private:

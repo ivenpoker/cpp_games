@@ -267,6 +267,14 @@ void TicTacToe::destroy_game() {
     for (UNSIGNED_LONG i = 0; i < this->main_game_board->size(); i++)
         delete (this->main_game_board->at(i));
     delete (this->main_game_board);
+
+    // Free pointers for the last move for first and second player
+    free(player1_pos);
+    free(player2_pos);
+}
+
+TicTacToe::~TicTacToe() {
+    this->destroy_game();
 }
 
 
