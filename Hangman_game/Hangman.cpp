@@ -42,6 +42,7 @@ Hangman::Hangman() {
 
 Hangman::Hangman(string &data_file_path) {
 
+    this->is_game_ready = false;
     this->client_file = new ifstream(data_file_path, ios::in);
     if (!(*this->client_file)) {
         this->handle_error_level(FILE_NOT_FOUND);
