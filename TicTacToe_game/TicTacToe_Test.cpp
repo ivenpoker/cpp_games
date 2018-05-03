@@ -57,7 +57,7 @@ int main(void) {
             cout << "[" << player1_moves->x_pos << ", " << player1_moves->y_pos << "]";
             player1_moves = player1_moves->next;
             if (player1_moves != nullptr) {
-                cout << " -- ";
+                cout << " --> ";
             }
         } while (player1_moves != nullptr); 
     }
@@ -71,11 +71,11 @@ int main(void) {
             cout << "[" << player2_moves->x_pos << ", " << player2_moves->y_pos << "]";
             player2_moves = player2_moves->next;
             if (player2_moves != nullptr) {
-                cout << " -- ";
+                cout << " --> ";
             }
         } while (player2_moves != nullptr);
     }
-    cout << endl;
+    cout << endl << endl;
 
     game_board_1->destroy_game();
     game_board_1->destroy_moves_history(player1_moves);
