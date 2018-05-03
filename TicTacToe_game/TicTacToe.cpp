@@ -8,6 +8,7 @@
 #include "TicTacToe.h"
 
 typedef unsigned long UNSIGNED_LONG;
+
 typedef struct position {
     int x_pos;
     int y_pos;
@@ -16,15 +17,43 @@ typedef struct position {
 POSITION_ptr_t player1_pos;
 POSITION_ptr_t player2_pos;
 
+
+// ################## Data Structure to keep track of ALL player valid moves ####################
+
+// A valid move structure
+
+typedef struct move_node {
+    struct move_node *next_ptr;
+    POSITION_t position;
+    struct move_node *prev_ptr;
+} MOVE_NODE_t, *MOVE_NODE_ptr_t;
+
+// Main structure that will hold (point to) all player moves.
+typedef struct player_moves {
+    MOVE_NODE_ptr_t moves_ptr;
+} PLAYER_MOVES_t, *PLAYER_MOVES_ptr_t;
+
+PLAYER_MOVES_ptr_t player1_moves;  // pointer to all player1 valid moves
+PLAYER_MOVES_ptr_t player2_moves;  // pointer to all player2 valid moves
+
+void initialize_player_moves(int player_code);
+void add_player_move(PLAYER_MOVES_ptr_t player_x_moves, POSITION_t next_move);
+ANCHOR_POSITION_LIST_ptr stringify_player_moves(PLAYER_MOVES_ptr_t player_x_moves);
+
+
 TicTacToe::TicTacToe(int board_size) {
     if (board_size < TicTacToe::MINIMUM_BOARD_SIZE) {
-        cerr << "Terminating game now ...." << endl;
+        cerr << "\n\t\tTerminating game now ..." << endl;
         this->evaluate_program(INVALID_BOARD_SIZE);
     }
 
     // initialize board
     this->initialize_game(board_size);
     this->curr_player = TicTacToe::PLAYER_ONE;
+
+    // Initialize player moves tracker
+    initialize_player_moves(TicTacToe::PLAYER_ONE);  // tracker for player1
+    initialize_player_moves(TicTacToe::PLAYER_TWO);  // tracker for player2
 
 }
 
@@ -90,7 +119,7 @@ void TicTacToe::evaluate_program(int game_code)  {
             break;
     }
     if (exit_program) {
-        exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
     }
 }
 
@@ -177,6 +206,10 @@ int TicTacToe::set_player_pos(char player_code, int x_ind, int y_ind) {
         if (player_code == TicTacToe::PLAYER_ONE) {
             player1_pos->x_pos = x_ind;
             player1_pos->y_pos = y_ind;
+
+            // keep track of this position
+            add_player_move(player1_moves, *player1_pos);
+
             this->main_game_board->at(x_ind)->at(y_ind) = TicTacToe::PLAYER_ONE;
             this->curr_player = TicTacToe::PLAYER_TWO;
 
@@ -186,6 +219,10 @@ int TicTacToe::set_player_pos(char player_code, int x_ind, int y_ind) {
         } else if (player_code == TicTacToe::PLAYER_TWO){
             player2_pos->x_pos = x_ind;
             player2_pos->y_pos = y_ind;
+
+            // keep track of this position
+            add_player_move(player2_moves, *player2_pos);
+
             this->main_game_board->at(x_ind)->at(y_ind) = TicTacToe::PLAYER_TWO;
             this->curr_player = TicTacToe::PLAYER_ONE;
 
@@ -277,8 +314,132 @@ TicTacToe::~TicTacToe() {
     this->destroy_game();
 }
 
+ANCHOR_POSITION_LIST_ptr TicTacToe::get_move_history(char player_char) {
+    return (TicTacToe::PLAYER_ONE == player_char ? stringify_player_moves(player1_moves) :
+                                                   stringify_player_moves(player2_moves));
+}
 
+void TicTacToe::destroy_moves_history(ANCHOR_POSITION_LIST_ptr list_ptr) {
+    if (list_ptr == nullptr || list_ptr->next == nullptr) return;
+    POSITION_NODE_LIST_ptr curr_del = list_ptr->next;
+    POSITION_NODE_LIST_ptr next_del = list_ptr->next->next;
 
+    while (curr_del != nullptr) {
+        free(curr_del);
+        curr_del = next_del;
+        next_del = curr_del->next;
+    }
+}
+
+void initialize_player_moves(int player_code) {
+
+    if (TicTacToe::PLAYER_ONE == player_code) {
+        player1_moves = (PLAYER_MOVES_ptr_t)malloc(sizeof(PLAYER_MOVES_t));
+        assert(player1_moves != nullptr);
+        player1_moves->moves_ptr = (MOVE_NODE_ptr_t)malloc(sizeof(MOVE_NODE_t));
+        assert(player1_moves->moves_ptr != nullptr);
+    } else {
+        player2_moves = (PLAYER_MOVES_ptr_t)malloc(sizeof(PLAYER_MOVES_t));
+        assert(player2_moves != nullptr);
+        player2_moves->moves_ptr = (MOVE_NODE_ptr_t)malloc(sizeof(MOVE_NODE_t));
+        assert(player2_moves->moves_ptr != nullptr);
+    }
+
+//    if (player_x_moves != nullptr) {
+//        // this player moves has already been initialized
+//        return;
+//    }
+//    player_x_moves = (PLAYER_MOVES_ptr_t)malloc(sizeof(PLAYER_MOVES_t));
+//    if (player_x_moves == nullptr) {
+//        cerr << "\n\t\t[GAME WARNING] Cannot track moves for player " << player_code << endl;
+//        return;
+//    }
+//    player_x_moves->moves_ptr = (MOVE_NODE_ptr_t)malloc(sizeof(MOVE_NODE_t));
+//    if (player_x_moves->moves_ptr == nullptr) {
+//        cerr << "\n\t\t[GAME WARNING] Cannot track moves for player " << player_code << endl;
+//    }
+}
+
+void add_player_move(PLAYER_MOVES_ptr_t player_x_moves, POSITION_t next_move) {
+    if (player_x_moves == nullptr) return;
+
+    MOVE_NODE_ptr_t new_node = (MOVE_NODE_ptr_t)malloc(sizeof(MOVE_NODE_t));
+
+    if (new_node == nullptr) {
+        cerr << "\n\t\t[GAME WARNING] Error while recording last move" << endl;
+
+        // At this level, we can completely stop the game (if it's absolutely) important
+        // that the game KNOWS all moves made by a player. To do that we can just assert
+        // that the 'new_node' is not null (before this if statement):
+        //
+        //          assert(new_node != nullptr)
+        //
+        // or we could just also use, 'exit(EXIT_FAILURE)' after printing the error
+        // message and terminating the program.
+
+        return;
+    }
+
+    new_node->position = next_move;
+
+    // if this is the first move for player
+
+    if (player_x_moves->moves_ptr->next_ptr == nullptr) {
+        player_x_moves->moves_ptr->next_ptr = new_node;
+
+        // We are using a doubly linked list to keep track of all player moves.
+        // Our chosen implementation is to let the anchor's (main node pointer
+        // to the list itself) previous pointer (pointer that is suppose to point
+        // tot he previous node) point to the last node i.e we're using a 'circular'
+        // doubly linked list to keep track of moves. The idea behind this to
+        // provide the possibility in the future to traverse the list from the 'back'.
+
+        player_x_moves->moves_ptr->prev_ptr = new_node;
+        new_node->next_ptr = nullptr;
+        new_node->prev_ptr = player_x_moves->moves_ptr;
+
+    } else {
+        // If there are already moves made to this player's 'move history'
+
+        new_node->next_ptr = player_x_moves->moves_ptr->next_ptr;
+        player_x_moves->moves_ptr->next_ptr->prev_ptr = new_node;
+        new_node->prev_ptr = player_x_moves->moves_ptr;
+        player_x_moves->moves_ptr->next_ptr = new_node;
+    }
+}
+
+ANCHOR_POSITION_LIST_ptr stringify_player_moves(PLAYER_MOVES_ptr_t player_x_moves) {
+
+    if (player_x_moves == nullptr) return nullptr; // player tracker not initialized
+    if (player_x_moves->moves_ptr == nullptr) return nullptr; // player moves not initialized
+    if (player_x_moves->moves_ptr->next_ptr == nullptr) return nullptr; // player did not make any moves
+
+    ANCHOR_POSITION_LIST_ptr player_moves_list = (ANCHOR_POSITION_LIST_ptr)malloc(sizeof(ANCHOR_POSITION_LIST_t));
+    if (player_moves_list == nullptr) {
+        cerr << "\t\t[SYSTEM ERROR] Memory allocation issues" << endl;
+        return nullptr;
+    }
+    MOVE_NODE_ptr_t tmp_move_ptr = (MOVE_NODE_ptr_t ) player_x_moves->moves_ptr->next_ptr;
+    while (tmp_move_ptr != nullptr) {
+        POSITION_NODE_LIST_ptr node = (POSITION_NODE_LIST_ptr)malloc(sizeof(POSITION_NODE_LIST_t));
+        if (node == nullptr) {
+            cerr << "\n\t[SYSTEM ERROR] Memory allocation issues" << endl;
+            return nullptr;
+        }
+        node->x_pos = tmp_move_ptr->position.x_pos;
+        node->y_pos = tmp_move_ptr->position.y_pos;
+
+        node->next = player_moves_list->next;
+        node->prev = player_moves_list;
+
+        if (player_moves_list->next != nullptr)
+            player_moves_list->next->prev = node;
+
+        player_moves_list->next = node;
+        tmp_move_ptr = tmp_move_ptr->next_ptr;
+    }
+    return player_moves_list;
+}
 
 
 

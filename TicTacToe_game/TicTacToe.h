@@ -25,11 +25,25 @@
 #include <vector>
 using namespace std;
 
+// This structure is UNIQUELY used for returning a history of player
+// moves back to the user.
+
+typedef struct position_node_list {
+    struct position_node_list *next;
+    int x_pos;
+    int y_pos;
+    struct position_node_list *prev;
+} POSITION_NODE_LIST_t, *POSITION_NODE_LIST_ptr;
+
+typedef POSITION_NODE_LIST_t ANCHOR_POSITION_LIST_t;
+typedef POSITION_NODE_LIST_ptr ANCHOR_POSITION_LIST_ptr;
+
 class TicTacToe {
 
 public:
     static const char PLAYER_ONE = 'X';
     static const char PLAYER_TWO = 'O';
+
 
     TicTacToe(int board_size = 3);
     void dipslay_board(void);
@@ -39,7 +53,10 @@ public:
     int set_player_pos(char player_code, int x_ind, int y_ind );
     void destroy_game(void);
     int get_current_player();
+    ANCHOR_POSITION_LIST_ptr get_move_history(char player_char);
+    void destroy_moves_history(ANCHOR_POSITION_LIST_ptr);
     ~TicTacToe();
+
 
 
 private:
