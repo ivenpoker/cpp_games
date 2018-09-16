@@ -307,12 +307,8 @@ int index_equivalent_from_char(char some_char) {
 }
 
 bool is_word(string & some_string) {
-    if (some_string.length() == 0) return BOOLEAN_FALSE;
-    if (some_string.length() == 1) {
-        if (index_equivalent_from_char(some_string.at(0)) == INVALID_CHAR)
-            return BOOLEAN_FALSE;
-        return BOOLEAN_TRUE;
-    }
+    if (some_string.length() == 0) return BOOLEAN_FALSE;       // an empty string is not a word
+    if (some_string.length() == 1) return BOOLEAN_FALSE;       // a single letter is not a word
     size_t size = some_string.length();
     for (size_t i = 0; i < size; i++)
         if (index_equivalent_from_char(some_string.at(i)) == INVALID_CHAR)
