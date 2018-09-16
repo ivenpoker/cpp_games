@@ -12,6 +12,8 @@ using namespace std;
 #define HARSH_TABLE_SIZE        26
 #define INSERT_FAILURE          false
 #define INSERT_SUCCESS          true
+#define BOOLEAN_TRUE            true
+#define BOOLEAN_FALSE           false
 
 // FOR ERROR HANDLING
 
@@ -35,6 +37,13 @@ const string Hangman::letters[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", 
  * (i.e from 0 - 25 (due to indexing in C++))
  */
 int index_equivalent_from_char(char some_char);
+
+/**
+ * Validates a string as a POSSIBLE word.
+ * @param some_string String to validate as word
+ * @return <code>true</code> if string is COULD be a valid word, else <code>false</code>
+ */
+bool is_word(string & some_string);
 
 Hangman::Hangman() {
     this->initialize_hash_table();
@@ -86,16 +95,16 @@ void Hangman::initialize_hash_table() {
 }
 
 bool Hangman::add_word(string &new_word) {
-    if (new_word.size() == 0) {
+    if (new_word.empty()) {
         cerr << "[WARNING] Empty string cannot be added" << endl;
         return INSERT_FAILURE;
     }
 
-    int hash_index = index_equivalent_from_char(new_word.at(WORD_FIRST_CHAR));
-    if (hash_index == INVALID_CHAR) {
+    if (!is_word(new_word)) {
         cerr << "[WARNING] Cannot add '" << new_word << "' as word. It is not a WORD." << endl;
         return INSERT_FAILURE;
     }
+    int hash_index = index_equivalent_from_char(new_word.at(WORD_FIRST_CHAR));
     return this->insert_hash_word(static_cast<unsigned int>(hash_index), new_word);
 }
 
@@ -291,10 +300,22 @@ void Hangman::handle_error_level(int error_code) const {
 int index_equivalent_from_char(char some_char) {
     if(some_char >= 'a' &&  some_char <= 'z') {
         return some_char - 'a';
-    }
-    else if(some_char >= 'A' && some_char <= 'Z') {
+    } else if(some_char >= 'A' && some_char <= 'Z') {
         return some_char - 'A';
-    }
-    else
+    } else
        return INVALID_CHAR;
+}
+
+bool is_word(string & some_string) {
+    if (some_string.length() == 0) return BOOLEAN_FALSE;
+    if (some_string.length() == 1) {
+        if (index_equivalent_from_char(some_string.at(0)) == INVALID_CHAR)
+            return BOOLEAN_FALSE;
+        return BOOLEAN_TRUE;
+    }
+    size_t size = some_string.length();
+    for (size_t i = 0; i < size; i++)
+        if (index_equivalent_from_char(some_string.at(i)) == INVALID_CHAR)
+            return BOOLEAN_FALSE;
+    return BOOLEAN_TRUE;
 }
